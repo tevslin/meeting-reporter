@@ -1,4 +1,4 @@
-packagin==23.2
+packaging==23.2
 langchain
 PyMuPDF
 langgraph

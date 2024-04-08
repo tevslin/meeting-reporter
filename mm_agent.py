@@ -215,7 +215,7 @@ class StateMachine:
         last_state=self.chain.get_state(self.thread).next[0].split(':')[0]
         if result is None:
             values=self.chain.get_state(self.thread).values\
-            values
+            st.write(values)
             "xxxx"
             print(values)
             return values[last_state]

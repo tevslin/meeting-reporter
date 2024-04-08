@@ -218,7 +218,7 @@ class StateMachine:
             values=self.chain.get_state(self.thread).values
             if self.st: #if streamlit available
                 self.st.write("I'm here")
-                self.st.write(json.dumps(values))
+                self.st.write(json.dumps(self.chain.get_state(self.thread)))
             return values[last_state]
         return result
         

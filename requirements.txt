@@ -4,4 +4,3 @@ langgraph
 langchain_openai
 html2text
 python-docx
-mimetypes

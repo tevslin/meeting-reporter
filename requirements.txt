@@ -4,5 +4,4 @@ langgraph
 langchain_openai
 html2text
 python-docx
-fitz
 mimetypes

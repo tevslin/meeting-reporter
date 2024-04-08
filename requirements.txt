@@ -5,3 +5,4 @@ langchain_openai
 html2text
 python-docx
 json5
+python-dotenv

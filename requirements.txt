@@ -4,3 +4,4 @@ langgraph
 langchain_openai
 html2text
 python-docx
+json5

@@ -101,11 +101,12 @@ class CritiqueAgent:
                        f"{str(article)}\n"
                        f"Your task is to provide a really short feedback on the article only if necessary.\n"
                        f"the article is a news story so should not include editrial comments."
-                       f"if you think the article is good, please return None.\n"
+                       f"if you think the article is good, please return only 'None.\n"
+                       f"do NOT return any text except the word 'None' if no further work is needed onthe article."
                        f"if you noticed the field 'message' in the article, it means the writer has revised the article"
-                        f"based on your previous critique. you can provide feedback on the revised article or just "
+                       f"based on your previous critique. you can provide feedback on the revised article or just "
                        f"return None if you think the article is good.\n"
-                        f"Please return a string of your critique or None.\n"
+                       f"Please return a string of your critique or 'None'.\n"
         }]
 
         lc_messages = convert_openai_messages(prompt)

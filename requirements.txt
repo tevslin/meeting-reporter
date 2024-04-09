@@ -1,8 +1,8 @@
 packaging==23.2
-langchain
+langchain==0.1.13
 PyMuPDF
-langgraph
-langchain_openai
+langgraph==.0.030
+langchain_openai==0.1.1
 html2text
 python-docx
 json5

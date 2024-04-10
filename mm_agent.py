@@ -79,12 +79,12 @@ class WriterAgent:
         return response
 
     def run(self, article: dict):
-        print("writer working...")
+        print("writer working...",article.keys())
         critique = article.get("critique")
         if critique is not None:
             article.update(self.revise(article))
         else:
-            article.update(self.writer( article["source"]))
+            article.update(self.writer( article["source"],word_count=article['words']))
         return article
 
 
@@ -130,11 +130,18 @@ class InputAgent:
     def run(self,article:dict):
         from mytools import extract_text_from_path_or_url
         
-        print ("input agent running")
-        print(article)
+        print ("input agent running...")
+        print(article.keys())
         if "url" in article:
             the_text=extract_text_from_path_or_url(article["url"])
-            article["source"]=the_text
+            
+        else:
+            if "raw" in article: #if already read
+                the_text=extract_text_from_path_or_url(article["file_name"],content=article['raw'])
+                del article["raw"]
+            else:
+                the_text=extract_text_from_path_or_url(article['file_name'])
+        article["source"]=the_text
         return article
             
 class OutputAgent:
@@ -195,22 +202,23 @@ class StateMachine:
         workflow.add_node("output",output_agent.run)
         workflow.add_node("human_review",human_review.run)
  
-        workflow.add_edge(start_agent.name,"input")
+        #workflow.add_edge(start_agent.name,"input")
         workflow.add_edge("input","write")
 
         workflow.add_edge('write', 'critique')
         workflow.add_edge('critique','human_review')
+        workflow.add_edge(start_agent.name,"input")
         workflow.add_conditional_edges(start_key='human_review',
                                        condition=lambda x: "accept" if x['critique'] is None else "revise",
                                        conditional_edge_mapping={"accept": "output", "revise": "write"})
+                                       
         
         # set up start and end nodes
         workflow.set_entry_point(start_agent.name)
         workflow.set_finish_point("output")
         
         self.thread={"configurable": {"thread_id": "2"}}
-        self.chain=workflow.compile(checkpointer=self.memory,interrupt_before=["input","human_review"])
-        
+        self.chain=workflow.compile(checkpointer=self.memory,interrupt_after=[start_agent.name,"critique"])
     def start(self):
         result=self.chain.invoke("",self.thread)
         #print("*",self.chain.get_state(self.thread),"*")

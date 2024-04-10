@@ -10,14 +10,15 @@ from typing import Optional, Any, Annotated, List, Dict, Literal
 
 from pydantic import BaseModel, Field
 
-def extract_text_from_path_or_url(path_or_url):
+def extract_text_from_path_or_url(path_or_url,content=None):
     import requests
     from bs4 import BeautifulSoup
     from docx import Document
     import fitz
     import io
     import mimetypes
-    content = ""
+    if not content:
+        content=""
     content_type = ""
 
     if path_or_url.startswith(('http://', 'https://')):
@@ -26,8 +27,9 @@ def extract_text_from_path_or_url(path_or_url):
         content_type = response.headers['Content-Type']
         content_type=(mimetypes.guess_extension(content_type))[1:]
     else:
-        with open(path_or_url, 'rb') as file:
-            content = file.read()
+        if not content: #if not already read
+            with open(path_or_url, 'rb') as file:
+                content = file.read()
         content_type=path_or_url.split(".")[-1]
 
     if 'html' == content_type:

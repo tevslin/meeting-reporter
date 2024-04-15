@@ -1,8 +1,8 @@
 # meeting_reporter
 Code, samples, and a working streamlit app for demonstrating:
-1.multiagent and human collaboration
-2 the use of langgraph to coordinate the interaction
-3.the mating of the langgraph and streamlit state machines (non-trivial)
+1. multiagent and human collaboration
+2. the use of langgraph to coordinate the interaction
+3. the mating of the langgraph and streamlit state machines (non-trivial)
 
 The agents are prompted to create a newsstory in collaboration with a human(you)from a meeting transcript or minutes which you either provide a URL to or upload. The input agent uploads or downloads the document as appropriate and extracts text from it; the writer agent drafts; the critique agent critiques; you can edit either the draft or the critique. the cycle continues until you are satisfied with a draft at which point it ia giiven to the output agent to display.
 

@@ -82,7 +82,11 @@ def process_form(form_number,article):
 
             st.session_state["newvalues"]={"body":text_boxes[0],"critique":text_boxes[1],"button":"OK"}
         
-        
+def rerun():
+    st.session_state['dm'] = None
+    st.session_state['result']=None
+    st.session_state["newvalues"]=None
+            
 
 # Initialize session state
 if 'api_key' not in st.session_state:
@@ -92,7 +96,7 @@ if 'api_key' not in st.session_state:
     st.session_state["newvalues"]=None
 
 # App title
-st.title("AI and Human Collaboration with Reflection Agent")
+st.title("Human-In-The-Loop AI Collaboration with Reflection Agent")
 
 with st.sidebar:
     st.markdown("""
@@ -119,23 +123,23 @@ with st.sidebar:
 # Sidebar for API key input
 
 if not st.session_state.api_key:
-    with st.sidebar:
-        api_key=st.text_input("Enter your ChatGPT API key (Tier 1 or higher account) to get started:", type="password")
-        if api_key:
-            st.session_state['api_key'] =api_key
-            st.rerun()
-    
+    #with st.sidebar:
+    api_key=st.text_input("Enter your ChatGPT API key (Tier 1 or higher account) to get started:", type="password")
+    if api_key:
+        st.session_state['api_key'] =api_key
+        st.rerun()
+with st.sidebar:
+    st.markdown("[feature requests](https://github.com/tevslin/meeting-reporter/discussions)", unsafe_allow_html=True)
+    st.markdown("[bug reports](https://github.com/tevslin/meeting-reporter/issues)", unsafe_allow_html=True)
+    st.markdown("[source code](https://github.com/tevslin/meeting-reporter)", unsafe_allow_html=True)
+    st.markdown("[more info](https://blog.tomevslin.com/2024/04/human-in-the-loop-artificial-intelligence.html)", unsafe_allow_html=True)    
 
 if st.session_state['api_key'] and st.session_state["dm"] is None:
     os.environ['OPENAI_API_KEY'] = st.session_state['api_key']
     st.session_state['dm'] = mm_agent.StateMachine()
     st.session_state["result"]=st.session_state['dm'].start()
     
-def rerun():
-    st.session_state['dm'] = None
-    st.session_state['result']=None
-    st.session_state["newvalues"]=None
-    
+
 
 if st.session_state["result"]:
     print("have result")
@@ -159,9 +163,10 @@ if st.session_state["result"]:
         st.markdown(st.session_state.result["body"])
         st.write("\n")
         st.write("summary:",st.session_state.result["summary"])
+        st.button("Run with new document",key="rerun",on_click=rerun)
         
         with st.sidebar:
-            st.button("Run with new document",key="rerun",on_click=rerun)
+            st.button("Run with new document",key="rerun1",on_click=rerun)
         
             
 

@@ -8,3 +8,5 @@ python-docx
 json5
 python-dotenv
 beautifulsoup4
+selenium
+webdriver_manager

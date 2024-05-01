@@ -10,7 +10,70 @@ from typing import Optional, Any, Annotated, List, Dict, Literal
 
 from pydantic import BaseModel, Field
 
-def extract_text_from_path_or_url(path_or_url,content=None):
+def extract_text(content,content_type):
+    from bs4 import BeautifulSoup
+    from docx import Document
+    import fitz
+    import io
+    
+    if 'html' in content_type:
+        return BeautifulSoup(content, 'html.parser').get_text()
+    elif 'docx' == content_type:
+        return "\n".join([paragraph.text for paragraph in Document(io.BytesIO(content)).paragraphs])
+    elif 'pdf' == content_type:
+        text = []
+        with fitz.open(stream=content, filetype="pdf") as doc:
+            for page in doc:
+                text.append(page.get_text())
+        return text
+    elif 'txt' == content_type:
+        return content.decode('utf-8')
+    else:
+        raise ValueError("Unsupported file type or content")
+        
+def load_text_from_path(path):
+    with open(path, 'rb') as file:
+        content = file.read()
+    content_type=path.split(".")[-1]
+    return extract_text(content, content_type)
+
+def load_text_from_url(url,timeout=10):
+    import requests
+    import mimetypes
+    from selenium import webdriver
+    from selenium.webdriver.firefox.options import Options
+    from selenium.webdriver.firefox.service import Service
+    from webdriver_manager.firefox import GeckoDriverManager
+    
+    the_split=url.split(".") #try to split out type
+    if the_split[-1] in ['html','docx','text','txt','pdf']: #if likely s static page or file
+        headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        }
+        response = requests.get(url,headers=headers,timeout=timeout)
+        response.raise_for_status() #caller will have to deal with error
+        content_type = response.headers['Content-Type'].split(';')[0]
+        content_type=(mimetypes.guess_extension(content_type))
+        if content_type.startswith('.'):
+            content_type=content_type[1:]
+        if content_type not in [['html','docx','txt','pdf']]: #if we don't recognize it
+            content_type=the_split[-1] #use it from file name
+        return extract_text(response.content,content_type)
+    else: #if not known to be static page
+        firefoxOptions = Options()
+        firefoxOptions.add_argument("--headless")
+        service = Service(GeckoDriverManager().install())
+        driver = webdriver.Firefox(
+            options=firefoxOptions,
+            service=service,
+        )
+        driver.set_page_load_timeout(timeout)
+        driver.get(url)
+        return extract_text(driver.page_source,"html")
+            
+    
+
+def extract_text_from_path_or_url(path_or_url,content=None,timeout=5):
     import requests
     from bs4 import BeautifulSoup
     from docx import Document
@@ -22,9 +85,13 @@ def extract_text_from_path_or_url(path_or_url,content=None):
     content_type = ""
 
     if path_or_url.startswith(('http://', 'https://')):
-        response = requests.get(path_or_url)
+        headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+}
+        response = requests.get(path_or_url,headers=headers,timeout=timeout)
+        response.raise_for_status() #caller will have to deal with error
         content = response.content
-        content_type = response.headers['Content-Type']
+        content_type = response.headers['Content-Type'].split(';')[0]
         content_type=(mimetypes.guess_extension(content_type))[1:]
     else:
         if not content: #if not already read
@@ -32,7 +99,7 @@ def extract_text_from_path_or_url(path_or_url,content=None):
                 content = file.read()
         content_type=path_or_url.split(".")[-1]
 
-    if 'html' == content_type:
+    if 'html' in content_type:
         return BeautifulSoup(content, 'html.parser').get_text()
     elif 'docx' == content_type:
         return "\n".join([paragraph.text for paragraph in Document(io.BytesIO(content)).paragraphs])
@@ -203,6 +270,7 @@ def RedditTool(input:Annotated[RedditToolInput,"Input to the search"])->List[Dic
     return thelist
 
 if __name__ == '__main__': #test code
+    """
     import asyncio
     theinput=ArxivToolInput(query="(LLM AND Newsroom) AND submittedDate:[20230101 TO 20240101]")
     answer=ArxivTool(theinput)
@@ -210,3 +278,9 @@ if __name__ == '__main__': #test code
     loop = asyncio.get_event_loop()
     answer=RedditTool(RedditToolInput(query="LLM in Newsroom",limit=5,time_filter='all'))
     print(len(answer),answer[0])
+    """
+    while True:
+        url=("url: ")
+        if not url:
+            break
+        print(load_text_from_url(url))

@@ -107,7 +107,7 @@ class CritiqueAgent:
                        f"based on your previous critique. you can provide feedback on the revised article or just "
                        f"return only the word 'None' without surrounding hash mark if you think the article is good.\n"
                        f"Please return a string of your critique or the word 'None' without surrounding hash marks.\n"
-        }]
+        }] 
 
         lc_messages = convert_openai_messages(prompt)
         response = ChatOpenAI(model='gpt-4', max_retries=1).invoke(lc_messages).content
@@ -128,19 +128,19 @@ class CritiqueAgent:
 class InputAgent:
        
     def run(self,article:dict):
-        from mytools import extract_text_from_path_or_url
+        from mytools import extract_text, load_text_from_path, load_text_from_url
         
         print ("input agent running...")
         print(article.keys())
         if "url" in article:
-            the_text=extract_text_from_path_or_url(article["url"])
+            the_text=load_text_from_url(article["url"])
             
         else:
             if "raw" in article: #if already read
-                the_text=extract_text_from_path_or_url(article["file_name"],content=article['raw'])
+                the_text=extract_text(content=article['raw'],content_type=article["file_name"].split('.')[-1])
                 del article["raw"]
             else:
-                the_text=extract_text_from_path_or_url(article['file_name'])
+                the_text=load_text_from_path(article['file_name'])
         article["source"]=the_text
         return article
             

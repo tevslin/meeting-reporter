@@ -32,7 +32,7 @@ def process_form(form_number,article):
 
         
         
-    print(form_number,article)
+    #print(form_number,article)
     if form_number==0:
         if "origin" in article: #if initial dialog happened
             if article["origin"]=="internet":
@@ -118,6 +118,7 @@ with st.sidebar:
     you can edit either the draft or
     the critique. This repeats until
     you are satisfied with a draft.
+    v0.0.3
 """)
 
 # Sidebar for API key input

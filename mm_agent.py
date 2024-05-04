@@ -6,6 +6,8 @@ from langgraph.graph import Graph
 from langchain.adapters.openai import convert_openai_messages
 from langchain_openai import ChatOpenAI
 
+MODEL='gpt-4-turbo'
+
 class WriterAgent:
 
     def writer(self, the_text:str,word_count=500):
@@ -41,8 +43,8 @@ class WriterAgent:
             "response_format": {"type": "json_object"}
         }
 
-        response = ChatOpenAI(model='gpt-4-0125-preview', max_retries=1, model_kwargs=optional_params).invoke(lc_messages).content
-        print (response)
+        response = ChatOpenAI(model=MODEL, max_retries=1, temperature=.5,model_kwargs=optional_params).invoke(lc_messages).content
+        #print (response)
         return json.loads(response)
 
     def revise(self, article: dict):
@@ -72,7 +74,7 @@ class WriterAgent:
             "response_format": {"type": "json_object"}
         }
 
-        response = ChatOpenAI(model='gpt-4-0125-preview', max_retries=1, model_kwargs=optional_params).invoke(lc_messages).content
+        response = ChatOpenAI(model=MODEL, max_retries=1, temperature=.5,model_kwargs=optional_params).invoke(lc_messages).content
         response = json.loads(response)
         print(f"For article: {article['title']}")
         print(f"Writer Revision Message: {response['message']}\n")
@@ -91,6 +93,8 @@ class WriterAgent:
 class CritiqueAgent:
 
     def critique(self, article: dict):
+        short_article=article.copy()
+        del short_article['source'] #to save tokens
         prompt = [{
             "role": "system",
             "content": "You are a newspaper writing critique. Your sole purpose is to provide short feedback on a written "
@@ -98,19 +102,22 @@ class CritiqueAgent:
         }, {
             "role": "user",
             "content": f"Today's date is {datetime.now().strftime('%d/%m/%Y')}\n."
-                       f"{str(article)}\n"
-                       f"Your task is to provide a really short feedback on the article only if necessary.\n"
-                       f"the article is a news story so should not include editrial comments."
+                       f"{str(short_article)}\n"
+                       f"Your task is to provide  feedback on the article only if necessary.\n"
+                       f"the article is a news story so should not include editorial comments."
+                       f"Be sure that names are given for split votes and for debate."
+                       f"The maker of each motion should be named."
                        f"if you think the article is good, please return only the word 'None' without the surrounding hash marks.\n"
                        f"do NOT return any text except the word 'None' without surrounding hash marks if no further work is needed onthe article."
                        f"if you noticed the field 'message' in the article, it means the writer has revised the article"
-                       f"based on your previous critique. you can provide feedback on the revised article or just "
-                       f"return only the word 'None' without surrounding hash mark if you think the article is good.\n"
-                       f"Please return a string of your critique or the word 'None' without surrounding hash marks.\n"
+                       f"based on your previous critique. The writer may have explained in message why some of your"
+                       f"critique could not be accomodated. For example, something you asked for is not available information."
+                       f"you can provide feedback on the revised article or "
+                       f"return only the word 'None' without surrounding hash mark if you think the article is good."
         }] 
 
         lc_messages = convert_openai_messages(prompt)
-        response = ChatOpenAI(model='gpt-4', max_retries=1).invoke(lc_messages).content
+        response = ChatOpenAI(model="gpt-4",temperature=1.0, max_retries=1).invoke(lc_messages).content
         if response == 'None':
             return {'critique': None}
         else:
@@ -122,6 +129,8 @@ class CritiqueAgent:
         print("critiquer working...",article.keys())
         article.update(self.critique(article))
         article["form"]=1
+        if "message" in article:
+            print('message',article['message'])
         return article
 
 

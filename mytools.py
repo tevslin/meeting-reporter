@@ -27,7 +27,7 @@ def extract_text(content,content_type):
                 text.append(page.get_text())
         return text
     elif 'txt' == content_type:
-        return content.decode('utf-8')
+        return content.decode('utf-8',errors='replace')
     else:
         raise ValueError("Unsupported file type or content")
         

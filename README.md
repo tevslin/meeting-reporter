@@ -42,6 +42,9 @@ Click the URL https://meeting-reporter.streamlit.app/. You will need an OPENAI a
 2. Set up a .env file with an entry for OPENAI_API_KEY set equal to your paid OpenAI key or otherwise set an environmental variable with that name
 3. Run mm_agent.py.
 
+### as a custom GPT (no api key or paid subscription required)
+click the URL https://chatgpt.com/g/g-roNR24Ty6-collaborative-meeting-reporter.
+
 ## ideas for enhancement
 1. Select a prompt depending on the content of the source
 2. Incorporate fact checking via browsing

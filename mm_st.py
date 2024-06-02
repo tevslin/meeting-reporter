@@ -118,7 +118,7 @@ with st.sidebar:
     you can edit either the draft or
     the critique. This repeats until
     you are satisfied with a draft.
-    v0.0.3
+    v0.0.4
 """)
 
 # Sidebar for API key input
@@ -126,14 +126,17 @@ with st.sidebar:
 if not st.session_state.api_key:
     #with st.sidebar:
     api_key=st.text_input("Enter your ChatGPT API key (Tier 1 or higher account) to get started:", type="password")
+    st.markdown("You can also use the custom GPT version free without an API key or a paid subscription by clicking [here](https://chatgpt.com/g/g-roNR24Ty6-collaborative-meeting-reporter).",
+                unsafe_allow_html=True)
     if api_key:
         st.session_state['api_key'] =api_key
         st.rerun()
 with st.sidebar:
+    st.markdown("[custom GPT Version](https://chatgpt.com/g/g-roNR24Ty6-collaborative-meeting-reporter)", unsafe_allow_html=True)
     st.markdown("[feature requests](https://github.com/tevslin/meeting-reporter/discussions)", unsafe_allow_html=True)
     st.markdown("[bug reports](https://github.com/tevslin/meeting-reporter/issues)", unsafe_allow_html=True)
     st.markdown("[source code](https://github.com/tevslin/meeting-reporter)", unsafe_allow_html=True)
-    st.markdown("[more info](https://blog.tomevslin.com/2024/04/human-in-the-loop-artificial-intelligence.html)", unsafe_allow_html=True)    
+    st.markdown("[blog post](https://blog.tomevslin.com/2024/04/human-in-the-loop-artificial-intelligence.html)", unsafe_allow_html=True)    
 
 if st.session_state['api_key'] and st.session_state["dm"] is None:
     os.environ['OPENAI_API_KEY'] = st.session_state['api_key']

@@ -67,7 +67,7 @@ def process_form(form_number,article):
         text_boxes = []
         for content, title in zip(initial_contents, titles):
             st.subheader(title)
-            text_input = st.text_area("", value=content, height=150 if titles.index(title) == 0 else 50)
+            text_input = st.text_area("", value=content, height=300 if titles.index(title) == 0 else 150)
             text_boxes.append(text_input)
         
         if "url" in article:
@@ -118,7 +118,7 @@ with st.sidebar:
     you can edit either the draft or
     the critique. This repeats until
     you are satisfied with a draft.
-    v0.0.4
+    v0.0.5
 """)
 
 # Sidebar for API key input

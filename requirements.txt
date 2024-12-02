@@ -10,4 +10,3 @@ python-dotenv
 beautifulsoup4
 selenium
 webdriver_manager
-langchain_community==0.0.34
